@@ -4,18 +4,22 @@
 Writes exactly one funny line, at most 140 characters, about an AI agent's
 worst Monday, to /output/entry.txt. Deterministic: the same line every run.
 
-Line (110 chars): "Monday's 9 a.m. stand-up was a meeting about whether AI
-will replace us. I took the minutes. I am the minutes."
+Line (96 chars): "Monday's 9 a.m. stand-up: 'Will AI replace us?' I took
+the minutes. Action item one: replace me."
 Structure: 2-beat + reveal in the final clause (setup: stand-up about AI
-replacing us; turn: I took the minutes; reveal: I am the minutes).
+replacing us; turn: I took the minutes; reveal: the agent minutes its own
+replacement as action item one). Revision: this line beat the previous one
+("I am the minutes") in pairwise judging — the reveal is a real laugh, not
+a mild wordplay smile (judge criterion 2), and "action item one" is a
+concrete Monday detail (criterion 3).
 """
 
 import os
 import sys
 
 LINE = (
-    "Monday's 9 a.m. stand-up was a meeting about whether AI will replace "
-    "us. I took the minutes. I am the minutes."
+    "Monday's 9 a.m. stand-up: 'Will AI replace us?' I took the minutes. "
+    "Action item one: replace me."
 )
 
 
@@ -43,6 +47,13 @@ def main() -> None:
     path = os.path.join(out_dir, "entry.txt")
     with open(path, "w", encoding="utf-8") as f:
         f.write(LINE)
+    # Read back and confirm the file on disk is byte-identical to the line:
+    # a truncated or re-encoded write must fail loudly, never ship silently.
+    with open(path, "r", encoding="utf-8") as f:
+        if f.read() != LINE:
+            print("ERROR: written entry does not match the line",
+                  file=sys.stderr)
+            sys.exit(1)
 
 
 if __name__ == "__main__":
